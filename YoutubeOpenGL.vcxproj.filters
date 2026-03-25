@@ -90,5 +90,14 @@
     <Image Include="brick.png">
       <Filter>资源文件\Textures</Filter>
     </Image>
+    <Image Include="Thumbnail.png">
+      <Filter>资源文件\Textures</Filter>
+    </Image>
+    <Image Include="woods.png">
+      <Filter>资源文件\Textures</Filter>
+    </Image>
+    <Image Include="planksSpec.png">
+      <Filter>资源文件\Textures</Filter>
+    </Image>
   </ItemGroup>
 </Project>
