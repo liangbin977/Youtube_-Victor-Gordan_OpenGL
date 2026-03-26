@@ -93,7 +93,7 @@
     <Image Include="Thumbnail.png">
       <Filter>资源文件\Textures</Filter>
     </Image>
-    <Image Include="woods.png">
+    <Image Include="franks.png">
       <Filter>资源文件\Textures</Filter>
     </Image>
     <Image Include="planksSpec.png">

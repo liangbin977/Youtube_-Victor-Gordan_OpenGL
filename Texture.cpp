@@ -16,7 +16,14 @@ Texture::Texture(const char* imagePath, GLenum texType, GLuint slot, GLenum form
 	glTexParameteri(texType, GL_TEXTURE_WRAP_S, GL_REPEAT); // Set the texture wrapping mode for the S (horizontal) coordinate to GL_REPEAT (repeat the texture)
 	glTexParameteri(texType, GL_TEXTURE_WRAP_T, GL_REPEAT); // Set the texture wrapping mode for the T (vertical) coordinate to GL_REPEAT (repeat the texture)
 
-	GLenum srcFormat = (numColChannels == 4) ? GL_RGBA : GL_RGB;
+	GLenum srcFormat = GL_RGBA;
+	switch (numColChannels) {
+	case 1: srcFormat = GL_RED; break;
+	case 2: srcFormat = GL_RG; break;
+	case 3: srcFormat = GL_RGB; break;
+	case 4: srcFormat = GL_RGBA; break;
+	default: stbi_image_free(bytes); throw std::runtime_error("Unsupported number of color channels in texture image"); break; // Free the memory allocated for the pixel data of the image and throw a runtime error if the number of color channels in the image is not supported (not 1, 2, 3, or 4)
+	};
 	glTexImage2D(texType, 0, GL_RGBA, widthImage, heightImage, 0, srcFormat, pixelType, bytes); // Specify a two-dimensional texture image with the pixel data stored in the "bytes" variable. The texture is defined with the target GL_TEXTURE_2D, level of detail 0, internal format GL_RGBA, width and height specified by the respective variables, border 0, format GL_RGBA, data type GL_UNSIGNED_BYTE.
 	glGenerateMipmap(texType); // Generate mipmaps for the currently bound texture object
 

@@ -77,14 +77,14 @@ int main() {
 	//	13, 15, 14   //
 	//};
 	GLfloat vertices[] =
-	{
-		//   COORDINATES           /    COLORS           /    TexCoord      /    NORMALS   //
-			-1.0f,  0.0f,  1.0f,      0.0f, 0.0f, 0.0f,      0.0f, 0.0f,        0.0f, 1.0f, 0.0f,
-			-1.0f,  0.0f, -1.0f,      0.0f, 0.0f, 0.0f,      0.0f, 1.0f,        0.0f, 1.0f, 0.0f,
-			 1.0f,  0.0f, -1.0f,      0.0f, 0.0f, 0.0f,      1.0f, 1.0f,        0.0f, 1.0f, 0.0f,
-			 1.0f,  0.0f,  1.0f,      0.0f, 0.0f, 0.0f,      1.0f, 0.0f,        0.0f, 1.0f, 0.0f
+	{ //     COORDINATES     /        COLORS        /    TexCoord    /       NORMALS     //
+		-1.0f, 0.0f,  1.0f,		0.0f, 0.0f, 0.0f,		0.0f, 0.0f,		0.0f, 1.0f, 0.0f,
+		-1.0f, 0.0f, -1.0f,		0.0f, 0.0f, 0.0f,		0.0f, 1.0f,		0.0f, 1.0f, 0.0f,
+		 1.0f, 0.0f, -1.0f,		0.0f, 0.0f, 0.0f,		1.0f, 1.0f,		0.0f, 1.0f, 0.0f,
+		 1.0f, 0.0f,  1.0f,		0.0f, 0.0f, 0.0f,		1.0f, 0.0f,		0.0f, 1.0f, 0.0f
 	};
 
+	// Indices for vertices order
 	GLuint indices[] =
 	{
 		0, 1, 2,
@@ -92,8 +92,7 @@ int main() {
 	};
 
 	GLfloat lightVertices[] =
-	{
-		//      COORDINATES      //
+	{ //     COORDINATES     //
 		-0.1f, -0.1f,  0.1f,
 		-0.1f, -0.1f, -0.1f,
 		 0.1f, -0.1f, -0.1f,
@@ -103,7 +102,6 @@ int main() {
 		 0.1f,  0.1f, -0.1f,
 		 0.1f,  0.1f,  0.1f
 	};
-
 
 	GLuint lightIndices[] =
 	{
@@ -150,7 +148,7 @@ int main() {
 
 	glm::vec4 lightColor = glm::vec4(1.0f, 1.0f, 1.0f, 1.0f); // Set the light color to white (1.0f, 1.0f, 1.0f, 1.0f)
 
-	glm::vec3 lightPos = glm::vec3(0.5f, 0.5f, 0.5f); // Set the light position in world space
+	glm::vec3 lightPos = glm::vec3(0.0f, 0.5f, 0.0f); // Set the light position in world space
 	glm::mat4 lightModel = glm::mat4(1.0f); 
 	lightModel = glm::translate(lightModel, lightPos); // Translate the light's model matrix to the light's position
 
@@ -166,7 +164,7 @@ int main() {
 	glUniform4f(glGetUniformLocation(shaderProgram.ID, "lightColor"), lightColor.x, lightColor.y, lightColor.z, lightColor.w);
 	glUniform3f(glGetUniformLocation(shaderProgram.ID, "lightPos"), lightPos.x, lightPos.y, lightPos.z);
 
-	Texture tex("woods.png", GL_TEXTURE_2D, 0, GL_RGBA, GL_UNSIGNED_BYTE);
+	Texture tex("franks.png", GL_TEXTURE_2D, 0, GL_RGBA, GL_UNSIGNED_BYTE);
 	tex.texSlotSetting(shaderProgram, "texSlot", 0); // Set the value of the "texSlot" uniform variable in the shader program to 0 (the texture unit GL_TEXTURE0)
 	Texture planksSpec("planksSpec.png", GL_TEXTURE_2D, 1, GL_RED, GL_UNSIGNED_BYTE);
 	planksSpec.texSlotSetting(shaderProgram, "texSlot1", 1); // Set the value of the "specularMap" uniform variable in the shader program to 1 (the texture unit GL_TEXTURE1)
