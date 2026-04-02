@@ -53,13 +53,16 @@ int main()
 
 	// Enables the Depth Buffer
 	glEnable(GL_DEPTH_TEST);
+	// Specifies the Depth Test to compare the new depth value with the existing depth value in the Depth Buffer
+	glDepthFunc(GL_LESS);
 
 	// Creates camera object
 	Camera camera(width, height, glm::vec3(0.0f, 0.0f, 2.0f));
 
 
 	// Load in a model
-	Model model("models/bunny/scene.gltf");
+	Model tree("models/trees/scene.gltf");
+	Model ground("models/ground/scene.gltf");
 
 
 	float modelYaw = 0.0f;
@@ -75,7 +78,7 @@ int main()
 	while (!glfwWindowShouldClose(window))
 	{
 		// Specify the color of the background
-		glClearColor(0.07f, 0.13f, 0.17f, 1.0f);
+		glClearColor(0.85f, 0.85f, 0.90f, 1.0f);
 		// Clean the back buffer and depth buffer
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
@@ -119,7 +122,8 @@ int main()
 		userModel = glm::rotate(userModel, glm::radians(modelYaw), glm::vec3(0.0f, 1.0f, 0.0f));
 		userModel = glm::rotate(userModel, glm::radians(modelPitch), glm::vec3(1.0f, 0.0f, 0.0f));
 
-		model.Draw(shaderProgram, camera, userModel);
+		tree.Draw(shaderProgram, camera, userModel);
+		ground.Draw(shaderProgram, camera, userModel);
 
 		glfwSwapBuffers(window);
 		glfwPollEvents();
