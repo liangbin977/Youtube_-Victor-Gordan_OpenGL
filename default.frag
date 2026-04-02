@@ -1,76 +1,110 @@
 #version 430 core
-//fragmentShader根据位置权重对vertex封闭起来的区域内的每一个片段进行着色，输出一个颜色值。每个片段的颜色值由纹理采样、光照计算和其他因素决定。
-out vec4 FragColor; // the output color of the fragment shader, which will be passed to the next stage in the pipeline (e.g., blending, depth testing, etc.)
 
-in vec3 ourColor;
-in vec2 TexCoord; //get the texture coord from the vertex shader
-in vec3 Normal; //get the normal from the vertex shader
-in vec3 crntPos; //get the current position from the vertex shader
+// Outputs colors in RGBA
+out vec4 FragColor;
 
-uniform sampler2D texSlot; //get the texture unit from the main function
-uniform sampler2D texSlot1; //get the second texture unit from the main function
-uniform vec4 lightColor; // get the light color from the main function
-uniform vec3 lightPos; // get the light position from the main function
-uniform vec3 camPos; // get the camera position from the main function
+// Imports the current position from the Vertex Shader
+in vec3 crntPos;
+// Imports the normal from the Vertex Shader
+in vec3 Normal;
+// Imports the color from the Vertex Shader
+in vec3 color;
+// Imports the texture coordinates from the Vertex Shader
+in vec2 texCoord;
 
-vec4 pointLight() {
-    vec3 lightVec = lightPos - crntPos; // calculate the vector from the current position to the light position
-    float dist = length(lightVec); // calculate the distance from the current position to the light position
-    float a = 2.0f;
-    float b = 0.7f;
-    float decay = 1.0f / (a * dist * dist + b * dist + 1.0f); // calculate the decay factor based on the distance and the attenuation coefficients
-    
-    float ambient = 0.2; // set the ambient lighting to a constant value
 
-    vec3 norm = normalize(Normal); //normalize the normal vector and get a unit vector that points in the same direction as the normal
-    vec3 lightDir = normalize(lightVec); //set the light direction by subtracting the current position from the light position and normalizing it
-    float diff = max(dot(norm, lightDir), 0.0f); //use the value of cosine to express the intensity of the light
-    
-    float specularStrength = 0.5f;    // set the strength of the specular highlight
-    vec3 viewDir = normalize(camPos - crntPos);    // calculate the view direction by subtracting the current position from the camera position and normalizing it
-    vec3 reflectDir = reflect(-lightDir, norm);    // calculate the reflection direction by reflecting the light direction around the normal vector
-    float specAmount = pow(max(dot(viewDir, reflectDir), 0.0f), 32);    // calculate the specular highlight using the dot product of the view direction and the reflection direction, raised to a power to control the shininess of the surface
-    float specular = specularStrength * specAmount;    // calculate the final specular contribution by multiplying the strength of the specular highlight by the calculated value
 
-    return (texture(texSlot, TexCoord) * (diff * decay + ambient) + texture(texSlot1, TexCoord).r * specular * decay) * lightColor;   //rememer to use multiply
-};
-vec4 direcLight() {
+// Gets the Texture Units from the main function
+uniform sampler2D diffuse0;
+uniform sampler2D specular0;
+// Gets the color of the light from the main function
+uniform vec4 lightColor;
+// Gets the position of the light from the main function
+uniform vec3 lightPos;
+// Gets the position of the camera from the main function
+uniform vec3 camPos;
 
-    float ambient = 0.2; // set the ambient lighting to a constant value
 
-    vec3 norm = normalize(Normal); //normalize the normal vector and get a unit vector that points in the same direction as the normal
-    vec3 lightDir = normalize(vec3(1.0f, 1.0f, 0.0f)); //set the light direction by subtracting the current position from the light position and normalizing it
-    float diff = max(dot(norm, lightDir), 0.0f); //use the value of cosine to express the intensity of the light
-    
-    float specularStrength = 0.5f;    // set the strength of the specular highlight
-    vec3 viewDir = normalize(camPos - crntPos);    // calculate the view direction by subtracting the current position from the camera position and normalizing it
-    vec3 reflectDir = reflect(-lightDir, norm);    // calculate the reflection direction by reflecting the light direction around the normal vector
-    float specAmount = pow(max(dot(viewDir, reflectDir), 0.0f), 32);    // calculate the specular highlight using the dot product of the view direction and the reflection direction, raised to a power to control the shininess of the surface
-    float specular = specularStrength * specAmount;    // calculate the final specular contribution by multiplying the strength of the specular highlight by the calculated value
+vec4 pointLight()
+{	
+	// used in two variables so I calculate it here to not have to do it twice
+	vec3 lightVec = lightPos - crntPos;
 
-    return (texture(texSlot, TexCoord) * (diff + ambient) + texture(texSlot1, TexCoord).r * specular) * lightColor;   //rememer to use multiply
-};
-vec4 spotLight() {
-    float outerCosine = 0.90f;
-    float innerCosine = 0.95f;
+	// intensity of light with respect to distance
+	float dist = length(lightVec);
+	float a = 3.0;
+	float b = 0.7;
+	float inten = 1.0f / (a * dist * dist + b * dist + 1.0f);
 
-    float ambient = 0.2; // set the ambient lighting to a constant value
+	// ambient lighting
+	float ambient = 0.20f;
 
-    vec3 norm = normalize(Normal); //normalize the normal vector and get a unit vector that points in the same direction as the normal
-    vec3 lightDir = normalize(lightPos - crntPos); //set the light direction by subtracting the current position from the light position and normalizing it
-    float diff = max(dot(norm, lightDir), 0.0f); //use the value of cosine to express the intensity of the light
-    
-    float specularStrength = 0.5f;    // set the strength of the specular highlight
-    vec3 viewDir = normalize(camPos - crntPos);    // calculate the view direction by subtracting the current position from the camera position and normalizing it
-    vec3 reflectDir = reflect(-lightDir, norm);    // calculate the reflection direction by reflecting the light direction around the normal vector
-    float specAmount = pow(max(dot(viewDir, reflectDir), 0.0f), 32);    // calculate the specular highlight using the dot product of the view direction and the reflection direction, raised to a power to control the shininess of the surface
-    float specular = specularStrength * specAmount;    // calculate the final specular contribution by multiplying the strength of the specular highlight by the calculated value
-    
-    float angle = dot(-lightDir, vec3(0.0f, -1.0f, 0.0f)); // calculate the angle between the light direction and the spotlight direction (assuming the spotlight is pointing in the negative z-axis)
-    float inten = clamp((angle - outerCosine) / (innerCosine - outerCosine), 0.0f, 1.0f); // calculate the intensity of the spotlight based on the angle and the inner and outer cone angles
+	// diffuse lighting
+	vec3 normal = normalize(Normal);
+	vec3 lightDirection = normalize(lightVec);
+	float diffuse = max(dot(normal, lightDirection), 0.0f);
 
-    return (texture(texSlot, TexCoord) * (diff * inten + ambient) + texture(texSlot1, TexCoord).r * specular * inten) * lightColor;   //rememer to use multiply
-};
-void main(){
-    FragColor = spotLight();
+	// specular lighting
+	float specularLight = 0.50f;
+	vec3 viewDirection = normalize(camPos - crntPos);
+	vec3 reflectionDirection = reflect(-lightDirection, normal);
+	float specAmount = pow(max(dot(viewDirection, reflectionDirection), 0.0f), 16);
+	float specular = specAmount * specularLight;
+
+	return (texture(diffuse0, texCoord) * (diffuse * inten + ambient) + texture(specular0, texCoord).r * specular * inten) * lightColor;
+}
+
+vec4 direcLight()
+{
+	// ambient lighting
+	float ambient = 0.20f;
+
+	// diffuse lighting
+	vec3 normal = normalize(Normal);
+	vec3 lightDirection = normalize(vec3(1.0f, 1.0f, 0.0f));
+	float diffuse = max(dot(normal, lightDirection), 0.0f); 
+
+	// specular lighting
+	float specularLight = 0.50f;
+	vec3 viewDirection = normalize(camPos - crntPos);
+	vec3 reflectionDirection = reflect(-lightDirection, normal);
+	float specAmount = pow(max(dot(viewDirection, reflectionDirection), 0.0f), 16);
+	float specular = specAmount * specularLight;
+
+	return (texture(diffuse0, texCoord) * (diffuse + ambient) + texture(specular0, texCoord).r * specular) * lightColor;
+}
+
+vec4 spotLight()
+{
+	// controls how big the area that is lit up is
+	float outerCone = 0.90f;
+	float innerCone = 0.95f;
+
+	// ambient lighting
+	float ambient = 0.20f;
+
+	// diffuse lighting
+	vec3 normal = normalize(Normal);
+	vec3 lightDirection = normalize(lightPos - crntPos);
+	float diffuse = max(dot(normal, lightDirection), 0.0f);
+
+	// specular lighting
+	float specularLight = 0.50f;
+	vec3 viewDirection = normalize(camPos - crntPos);
+	vec3 reflectionDirection = reflect(-lightDirection, normal);
+	float specAmount = pow(max(dot(viewDirection, reflectionDirection), 0.0f), 16);
+	float specular = specAmount * specularLight;
+
+	// calculates the intensity of the crntPos based on its angle to the center of the light cone
+	float angle = dot(vec3(0.0f, -1.0f, 0.0f), -lightDirection);
+	float inten = clamp((angle - outerCone) / (innerCone - outerCone), 0.0f, 1.0f);
+
+	return (texture(diffuse0, texCoord) * (diffuse * inten + ambient) + texture(specular0, texCoord).r * specular * inten) * lightColor;
+}
+
+
+void main()
+{
+	// outputs final color
+	FragColor = direcLight();
 }
