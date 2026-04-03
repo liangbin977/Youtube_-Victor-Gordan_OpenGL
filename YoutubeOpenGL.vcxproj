@@ -165,6 +165,8 @@
     <None Include="default.vert" />
     <None Include="light.frag" />
     <None Include="light.vert" />
+    <None Include="outlining.frag" />
+    <None Include="outlining.vert" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="brick.png" />

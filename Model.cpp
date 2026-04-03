@@ -1,5 +1,5 @@
 #include"Model.h"
-
+//node -> mesh -> primitive -> accessor -> bufferView -> buffer
 Model::Model(const char* file)
 {
 	// Make a JSON object

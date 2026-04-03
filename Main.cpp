@@ -38,6 +38,7 @@ int main()
 
 	// Generates Shader object using shaders default.vert and default.frag
 	Shader shaderProgram("default.vert", "default.frag");
+	Shader outLiningProgram("outlining.vert", "outlining.frag");
 
 	// Take care of all the light related things
 	glm::vec4 lightColor = glm::vec4(1.0f, 1.0f, 1.0f, 1.0f);
@@ -51,8 +52,13 @@ int main()
 
 
 
-	// Enables the Depth Buffer
+	// Enables the Depth & Stencil Buffer
 	glEnable(GL_DEPTH_TEST);
+	//The stencil buffer is a system in the GPU that automatically performs tests and writes 
+	// for each fragment during the rasterization stage.
+	glEnable(GL_STENCIL_TEST);
+
+	glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
 	// Specifies the Depth Test to compare the new depth value with the existing depth value in the Depth Buffer
 	glDepthFunc(GL_LESS);
 
@@ -61,9 +67,8 @@ int main()
 
 
 	// Load in a model
-	Model tree("models/trees/scene.gltf");
-	Model ground("models/ground/scene.gltf");
-
+	Model crow("models/crow/scene.gltf");
+	Model crow_outline("models/crow-outline/scene.gltf");
 
 	float modelYaw = 0.0f;
 	float modelPitch = 0.0f;
@@ -80,7 +85,7 @@ int main()
 		// Specify the color of the background
 		glClearColor(0.85f, 0.85f, 0.90f, 1.0f);
 		// Clean the back buffer and depth buffer
-		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 
 		// Handles camera inputs
 		camera.Inputs(window);
@@ -122,8 +127,18 @@ int main()
 		userModel = glm::rotate(userModel, glm::radians(modelYaw), glm::vec3(0.0f, 1.0f, 0.0f));
 		userModel = glm::rotate(userModel, glm::radians(modelPitch), glm::vec3(1.0f, 0.0f, 0.0f));
 
-		tree.Draw(shaderProgram, camera, userModel);
-		ground.Draw(shaderProgram, camera, userModel);
+		glStencilFunc(GL_ALWAYS, 1, 0xFF);
+		glStencilMask(0xFF);
+		crow.Draw(shaderProgram, camera, userModel);
+
+		glStencilFunc(GL_NOTEQUAL, 1, 0xFF);
+		glStencilMask(0x00);
+		glDisable(GL_DEPTH_TEST);
+		crow_outline.Draw(outLiningProgram, camera, userModel);
+
+		glStencilMask(0xFF);
+		glStencilFunc(GL_ALWAYS, 0, 0xFF);
+		glEnable(GL_DEPTH_TEST);
 
 		glfwSwapBuffers(window);
 		glfwPollEvents();
