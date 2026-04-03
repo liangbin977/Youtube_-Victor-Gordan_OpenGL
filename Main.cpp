@@ -54,21 +54,26 @@ int main()
 
 	// Enables the Depth & Stencil Buffer
 	glEnable(GL_DEPTH_TEST);
-	//The stencil buffer is a system in the GPU that automatically performs tests and writes 
-	// for each fragment during the rasterization stage.
-	glEnable(GL_STENCIL_TEST);
 
-	glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
-	// Specifies the Depth Test to compare the new depth value with the existing depth value in the Depth Buffer
-	glDepthFunc(GL_LESS);
+	//Enables back face culling
+	glEnable(GL_CULL_FACE);
+	glCullFace(GL_BACK);
+	glFrontFace(GL_CCW);
+	
 
 	// Creates camera object
 	Camera camera(width, height, glm::vec3(0.0f, 0.0f, 2.0f));
 
 
 	// Load in a model
-	Model crow("models/crow/scene.gltf");
-	Model crow_outline("models/crow-outline/scene.gltf");
+	Model statue("models/statue/scene.gltf");
+
+
+	double prevTime = 0.0;
+	double crntTime = 0.0;
+	double timeDiff;
+	unsigned int counter = 0;
+
 
 	float modelYaw = 0.0f;
 	float modelPitch = 0.0f;
@@ -82,6 +87,17 @@ int main()
 	// Main while loop
 	while (!glfwWindowShouldClose(window))
 	{
+		crntTime = glfwGetTime();
+		timeDiff = crntTime - prevTime;
+		counter++;
+		if (timeDiff >= 1.0 / 30.0) {
+			std::string FPS = std::to_string(counter / timeDiff);
+			std::string ms = std::to_string(timeDiff / counter * 1000);
+			std::string newTitle = "YoutubeOpenGL - " + FPS + " FPS / " + ms + " ms";
+			glfwSetWindowTitle(window, newTitle.c_str());
+			prevTime = crntTime;
+			counter = 0;
+		};
 		// Specify the color of the background
 		glClearColor(0.85f, 0.85f, 0.90f, 1.0f);
 		// Clean the back buffer and depth buffer
@@ -127,18 +143,9 @@ int main()
 		userModel = glm::rotate(userModel, glm::radians(modelYaw), glm::vec3(0.0f, 1.0f, 0.0f));
 		userModel = glm::rotate(userModel, glm::radians(modelPitch), glm::vec3(1.0f, 0.0f, 0.0f));
 
-		glStencilFunc(GL_ALWAYS, 1, 0xFF);
-		glStencilMask(0xFF);
-		crow.Draw(shaderProgram, camera, userModel);
 
-		glStencilFunc(GL_NOTEQUAL, 1, 0xFF);
-		glStencilMask(0x00);
-		glDisable(GL_DEPTH_TEST);
-		crow_outline.Draw(outLiningProgram, camera, userModel);
+		statue.Draw(shaderProgram, camera, userModel);
 
-		glStencilMask(0xFF);
-		glStencilFunc(GL_ALWAYS, 0, 0xFF);
-		glEnable(GL_DEPTH_TEST);
 
 		glfwSwapBuffers(window);
 		glfwPollEvents();
