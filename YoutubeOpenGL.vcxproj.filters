@@ -97,6 +97,20 @@
     <None Include="light.vert">
       <Filter>资源文件\Shaders</Filter>
     </None>
+    <None Include="outlining.frag" />
+    <None Include="outlining.vert" />
+    <None Include="grass.frag">
+      <Filter>资源文件\Shaders</Filter>
+    </None>
+    <None Include="windows.frag">
+      <Filter>资源文件\Shaders</Filter>
+    </None>
+    <None Include="framebuffer.vert">
+      <Filter>资源文件\Shaders</Filter>
+    </None>
+    <None Include="framebuffer.frag">
+      <Filter>资源文件\Shaders</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <Image Include="brick.png">

@@ -62,7 +62,7 @@ vec4 direcLight()
 	// diffuse lighting
 	vec3 normal = normalize(Normal);
 	vec3 lightDirection = normalize(vec3(1.0f, 1.0f, 0.0f));
-	float diffuse = max(dot(normal, lightDirection), 0.0f); 
+	float diffuse = max(dot(normal, lightDirection), 0.0f);
 
 	// specular lighting
 	float specularLight = 0.50f;
@@ -102,29 +102,9 @@ vec4 spotLight()
 	return (texture(diffuse0, texCoord) * (diffuse * inten + ambient) + texture(specular0, texCoord).r * specular * inten) * lightColor;
 }
 
-float near = 0.1f;
-float far = 100.0f;
-
-float linearizeDepth(float depth)
-{
-	// linearizes the depth value from the depth buffer, which is non-linear due to perspective projection
-	return (2.0 * near * far) / (far + near - (depth * 2.0 - 1.0) * (far - near));
-}
-
-float logisticDepth(float depth, float steepness, float offset)
-{
-	float zVal = linearizeDepth(depth);
-	// use S curve to make the depth values more visually appealing, with the steepness and offset controlling the shape of the curve
-	return (1 / (1 + exp(-steepness * (zVal - offset))));
-}
 
 void main()
 {
 	// outputs final color
-	float depth = logisticDepth(gl_FragCoord.z, 0.5f, 5.0f);	
-
-	//In physics, I_final = I_object * e^(−kd) + I_fog * (1 − e^(−kd))
-	//In GPU, it simplifies to I_final = I_object * (1 - depth) + I_fog * depth, where depth is the value from the logistic function
-
 	FragColor = direcLight();
 }
