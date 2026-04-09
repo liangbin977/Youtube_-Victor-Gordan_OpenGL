@@ -117,6 +117,15 @@
     <None Include="skybox.frag">
       <Filter>资源文件\Shaders</Filter>
     </None>
+    <None Include="default.geom">
+      <Filter>资源文件\Shaders</Filter>
+    </None>
+    <None Include="normals.frag">
+      <Filter>资源文件\Shaders</Filter>
+    </None>
+    <None Include="normals.geom">
+      <Filter>资源文件\Shaders</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <Image Include="brick.png">

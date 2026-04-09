@@ -10,14 +10,15 @@ layout (location = 2) in vec3 aColor;
 layout (location = 3) in vec2 aTex;
 
 
-// Outputs the current position for the Fragment Shader
-out vec3 crntPos;
-// Outputs the normal for the Fragment Shader
-out vec3 Normal;
-// Outputs the color for the Fragment Shader
-out vec3 color;
-// Outputs the texture coordinates to the Fragment Shader
-out vec2 texCoord;
+// no need to out crntPos, because the geometry shader will calculate the current positions automatically.
+// out vec3 crntPos;
+out DATA
+{
+	vec3 Normal;
+	vec3 color;
+	vec2 texCoord;
+	mat4 projection;
+} data_out; //data_out is the output data for each vertex of the triangle.
 
 
 
@@ -32,15 +33,9 @@ uniform mat4 scale;
 
 void main()
 {
-	// calculates current position
-	crntPos = vec3(model * translation * rotation * scale * vec4(aPos, 1.0f));
-	// Assigns the normal from the Vertex Data to "Normal"
-	Normal = aNormal;
-	// Assigns the colors from the Vertex Data to "color"
-	color = aColor;
-	// Assigns the texture coordinates from the Vertex Data to "texCoord"
-	texCoord = mat2(-1,0,0,-1)*aTex;
-	
-	// Outputs the positions/coordinates of all vertices
-	gl_Position = cameraMatrix * vec4(crntPos, 1.0);
+	gl_Position = model * translation * rotation * scale  * vec4(aPos, 1.0f);
+	data_out.Normal = aNormal;
+	data_out.color = aColor;
+	data_out.texCoord = mat2(0, -1, 1, 0) * aTex;
+	data_out.projection = cameraMatrix;
 }
