@@ -12,6 +12,7 @@ in DATA
 	mat4 projection;
 } data_in[];
 //以下是针对一个图元（一个三角形）的处理
+void main()
 {
 	gl_Position = data_in[0].projection * gl_in[0].gl_Position;
 	EmitVertex();

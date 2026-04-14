@@ -126,6 +126,12 @@
     <None Include="normals.geom">
       <Filter>资源文件\Shaders</Filter>
     </None>
+    <None Include="asteroid.frag">
+      <Filter>资源文件\Shaders</Filter>
+    </None>
+    <None Include="asteroid.vert">
+      <Filter>资源文件\Shaders</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <Image Include="brick.png">

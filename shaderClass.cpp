@@ -16,7 +16,31 @@ std::string get_file_contents(const char* filename)
 	std::cout << "Failed to read shader file: " << filename << std::endl;
     throw(errno);
 }
+Shader::Shader(const char* vertexFile, const char* fragmentFile) {
+    std::string vertexShaderSource = get_file_contents(vertexFile);
+    std::string fragmentShaderSource = get_file_contents(fragmentFile);
 
+    const char* vertexShaderSourceCStr = vertexShaderSource.c_str();
+    const char* fragmentShaderSourceCStr = fragmentShaderSource.c_str();
+
+    GLuint vertexShader = glCreateShader(GL_VERTEX_SHADER);
+    glShaderSource(vertexShader, 1, &vertexShaderSourceCStr, nullptr);
+    glCompileShader(vertexShader); // Compile the vertex shader into machine code that the GPU can understand
+    errorCheck(vertexShader, GL_COMPILE_STATUS, false, "VERTEX SHADER COMPILATION FAILED");
+
+    GLuint fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
+    glShaderSource(fragmentShader, 1, &fragmentShaderSourceCStr, nullptr);
+    glCompileShader(fragmentShader); // Compile the fragment shader into machine code that the GPU can understand
+    errorCheck(fragmentShader, GL_COMPILE_STATUS, false, "FRAGMENT SHADER COMPILATION FAILED");
+
+
+    ID = glCreateProgram();
+    glAttachShader(ID, vertexShader);
+    glAttachShader(ID, fragmentShader);
+    glLinkProgram(ID); // link all the shaders together into the final program that will run on the GPU
+    glDeleteShader(vertexShader);
+    glDeleteShader(fragmentShader);
+};
 Shader::Shader(const char* vertexFile, const char* fragmentFile, const char* geometryFile) {
     std::string vertexShaderSource = get_file_contents(vertexFile);
     std::string fragmentShaderSource = get_file_contents(fragmentFile);
